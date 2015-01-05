@@ -1,0 +1,14 @@
+<!DOCTYPE MeshLabDocument>
+<MeshLabProject>
+ <MeshGroup>
+  <MLMesh label="elephant.off" filename="../elephant.off">
+   <MLMatrix44>
+-0.000487662 -0.000319623 0.00933317 0.0870283 
+0.00933783 -0.000140468 0.000483095 -0.019204 
+0.000123683 0.00934485 0.000326485 0.434471 
+0 0 0 1 
+</MLMatrix44>
+  </MLMesh>
+ </MeshGroup>
+ <RasterGroup/>
+</MeshLabProject>
