@@ -40,7 +40,8 @@ static int spell_num;
 enum Spell {
   SPELL_NONE,
   FIREBALL,
-  ICE_BLAST
+  ICE_BLAST,
+  LIGHTNING
 };
 
 static int current_spell = SPELL_NONE;
@@ -54,6 +55,7 @@ R3Scene *InitializeScene();
 void InitializeGame();
 void castFireball();
 void castIceBlast();
+void castLightning();
 void castEnemySpell(int val);
 void DrawEnemy(R3Scene* scene);
 void DrawSpell(R3Scene* scene);
@@ -260,7 +262,7 @@ void DrawParticles(R3Scene *scene)
   double current_time = GetTime();
   static double previous_time = 0;
 
-  printf("%i\n", scene->NParticles());
+  // printf("%i\n", scene->NParticles());
 
   // program just started up?
   if (previous_time == 0) previous_time = current_time;
@@ -446,12 +448,22 @@ void GLUTKeyboard(unsigned char key, int, int y)
         playerSpellHit(0);
       }
       break;
-    case 'a':
+    case 'z':
       if (player_cast && current_spell == ICE_BLAST) {
         player_cast_success = true;
         player_cast = false;
         playerSpellHit(0);
       }
+      break;
+    case 'o':
+      if (player_cast && current_spell == LIGHTNING) {
+        player_cast_success = true;
+        player_cast = false;
+        playerSpellHit(0);
+      }
+      break;
+    case 'q':
+      exit(0);
       break;
   }
 
@@ -545,11 +557,14 @@ void castEnemySpell(int val) {
   player_cast_success = false;
 
   double r = RandomNumber();
-  if (r < .5) {
+  if (r < .33) {
     castFireball();
   }
-  else {
+  else if (r < .67) {
     castIceBlast();
+  }
+  else {
+    castLightning();
   }
 
   glutTimerFunc(CAST_RATE * 5, enemySpellHit, ++spell_num);
@@ -653,6 +668,33 @@ void castIceBlast() {
   spell_sink.quadratic_attenuation = 0;
 }
 
+void castLightning() {
+  current_spell = LIGHTNING;
+
+  spell_source.shape = new R3Shape();
+  spell_source.shape->type = R3_SPHERE_SHAPE;
+  spell_source.shape->sphere = new R3Sphere(R3Point(-.41, .5, .1), .01);
+  spell_source.rate = 400;
+  spell_source.velocity = .3;
+  spell_source.angle_cutoff = 2 * 3.14;
+  spell_source.mass = .1;
+  spell_source.fixed = false;
+  spell_source.drag = 0;
+  spell_source.elasticity = 1;
+  spell_source.lifetime = 2;
+  spell_source.material = new R3Material();
+  spell_source.material->kd.SetRed(.9);
+  spell_source.material->kd.SetGreen(.9);
+  spell_source.material->kd.SetBlue(.1);
+
+  spell_sink.shape = new R3Shape();
+  spell_sink.shape->type = R3_SPHERE_SHAPE;
+  spell_sink.shape->sphere = new R3Sphere(R3Point(-.41, .5, .1), .001);
+  spell_sink.intensity = .06;
+  spell_sink.constant_attenuation = 1;
+  spell_sink.linear_attenuation = 0;
+  spell_sink.quadratic_attenuation = 0;
+}
 
 
 
